@@ -1,23 +1,23 @@
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
+import Groq from "groq-sdk";
 
 export async function POST(req: Request) {
   try {
     const { text } = await req.json();
 
-    if (!process.env.OPENAI_API_KEY) {
+    if (!process.env.GROQ_API_KEY) {
       return NextResponse.json(
-        { error: "Missing OPENAI_API_KEY" },
+        { error: "Missing GROQ_API_KEY" },
         { status: 500 }
       );
     }
 
-    const client = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+    const client = new Groq({
+      apiKey: process.env.GROQ_API_KEY,
     });
 
-    const response = await client.chat.completions.create({
-      model: "gpt-4.1-mini",
+    const completion = await client.chat.completions.create({
+      model: "llama-3.1-8b-instant",
       messages: [
         {
           role: "system",
@@ -42,16 +42,14 @@ Return ONLY valid JSON:
       temperature: 0.7,
     });
 
-    const content = response.choices?.[0]?.message?.content;
+    const content = completion.choices[0]?.message?.content;
 
     if (!content) {
       return NextResponse.json(
-        { error: "Empty AI response" },
+        { error: "Empty response from Groq" },
         { status: 500 }
       );
     }
-
-    console.log("RAW AI RESPONSE:", content);
 
     let data;
     try {
@@ -59,7 +57,7 @@ Return ONLY valid JSON:
     } catch {
       return NextResponse.json(
         {
-          error: "Invalid JSON from AI",
+          error: "Model did not return valid JSON",
           raw: content,
         },
         { status: 500 }
@@ -68,13 +66,9 @@ Return ONLY valid JSON:
 
     return NextResponse.json(data);
   } catch (err: unknown) {
-    console.error("API ERROR:", err);
     const message = err instanceof Error ? err.message : "Server error";
-
     return NextResponse.json(
-      {
-        error: message,
-      },
+      { error: message },
       { status: 500 }
     );
   }
