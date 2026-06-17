@@ -8,7 +8,6 @@ type Result = {
   regret_score: number;
   advice: string;
   category: "money" | "relationships" | "school" | "health" | "other";
-  note?: string;
 };
 
 const LABELS: Record<Result["category"], string> = {
@@ -25,11 +24,9 @@ export default function ResultCard({ data }: { data: Result }) {
       <div className="resultHeader">
         <div>
           <h2>{data.title}</h2>
-          <div className="resultTagRow">
-            <span className="badge">{LABELS[data.category]}</span>
-            <span className="resultScore">{data.regret_score}% regret</span>
-          </div>
+          <span className="badge">{LABELS[data.category]}</span>
         </div>
+        <div className="resultScore">{data.regret_score}% regret</div>
       </div>
 
       <RegretMeter score={data.regret_score} />
@@ -50,12 +47,6 @@ export default function ResultCard({ data }: { data: Result }) {
       </div>
 
       <div className="advice">💡 {data.advice}</div>
-      {data.note ? (
-        <div className="noteCard">
-          <h3>Saved note</h3>
-          <p>{data.note}</p>
-        </div>
-      ) : null}
     </div>
   );
 }
