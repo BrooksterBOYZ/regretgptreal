@@ -21,8 +21,8 @@ export default function RegretMeter({ score }: { score: number }) {
   return (
     <div className="meterWrapper">
       <div className="meterLabel">
-        <span>Regret level</span>
-        <span>{clamped}%</span>
+        <span className="meterLabelText">Regret intensity</span>
+        <span className="meterValue">{clamped}%</span>
       </div>
       <div className="meter">
         <div
